@@ -14,7 +14,7 @@ object GreeterServer {
   def stream[F[_]: ConcurrentEffect](implicit T: Timer[F], C: ContextShift[F]): Stream[F, Nothing] = {
     for {
       client <- BlazeClientBuilder[F](global).stream
-      helloWorldAlg = Greeter.impl[F]
+      greeterAlg = Greeter.impl[F]
       jokeAlg = Jokes.impl[F](client)
 
       // Combine Service Routes into an HttpApp.
@@ -22,8 +22,9 @@ object GreeterServer {
       // want to extract a segments not checked
       // in the underlying routes.
       httpApp = (
-        GreeterRoutes.helloWorldRoutes[F](helloWorldAlg) <+>
-        GreeterRoutes.jokeRoutes[F](jokeAlg)
+        GreeterRoutes.greeterRoutes[F](greeterAlg) <+>
+        GreeterRoutes.jokeRoutes[F](jokeAlg) <+>
+        GreeterRoutes.healthRoutes
       ).orNotFound
 
       // With Middlewares in place

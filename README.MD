@@ -1,14 +1,19 @@
 # Greeter
-The application exposes two endpoints 
+The application exposes following endpoints at port **9090** 
+- `/health-check`
 - `/hello` 
-- `/joke` 
-at port **9090**
+- `/joke`
+
 ---
 ## Usage
 
-### Hello endpoint 
+### Health check endoint
 
-Send across a HTTP GET request to path `/hello/<name>` for a JSON response 
+Send across a HTTP GET request to path `/health-check` for response with content `Okay`
+
+### Greet endpoint 
+
+Send across a HTTP GET request to path `/greet/<name>` for a JSON response 
 `{"message":"Hello, <name>"}`
 
 ### Joke endpoint
