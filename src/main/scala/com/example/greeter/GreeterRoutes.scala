@@ -9,14 +9,21 @@ import org.http4s.HttpRoutes
 import org.http4s.syntax._
 import org.http4s.dsl.io._
 import org.http4s.implicits._
+import cats.data.State
 
 object GreeterRoutes {
+
+  private[this] var isHealthy = true
 
   def healthRoutes[F[_]: Sync]: HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
     HttpRoutes.of[F] {
-      case GET -> Root / "health-check" => Ok(s"Okay")
+      case GET -> Root / "health-check" if isHealthy => Ok(s"Okay")
+      case GET -> Root / "health-check" if !isHealthy => InternalServerError()
+      case POST -> Root / "toggle-health" =>
+        isHealthy = !isHealthy
+        Ok()
     }
   }
 
@@ -32,13 +39,13 @@ object GreeterRoutes {
     }
   }
 
-  def greeterRoutes[F[_]: Sync](H: Greeter[F]): HttpRoutes[F] = {
+  def greeterRoutes[F[_]: Sync](greeter: Greeter[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
     HttpRoutes.of[F] {
       case GET -> Root / "greet" / name =>
         for {
-          greeting <- H.greet(Greeter.Name(name))
+          greeting <- greeter.greet(Greeter.Name(name))
           resp <- Ok(greeting)
         } yield resp
     }

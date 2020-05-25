@@ -31,3 +31,4 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings",
 )
 enablePlugins(JavaServerAppPackaging)
+dockerExposedPorts := Seq(9090, 9090)
